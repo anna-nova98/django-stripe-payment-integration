@@ -1,0 +1,45 @@
+{% extends "shop/base.html" %}
+
+{% block title %}Buy {{ item.name }}{% endblock %}
+
+{% block content %}
+  <h1>{{ item.name }}</h1>
+  <p>{{ item.description }}</p>
+  <p class="price">{{ item.price }} {{ item.currency|upper }}</p>
+
+  <button id="buy-button" class="btn">Buy</button>
+  <p id="error-msg" style="color:#e25950;margin-top:12px;display:none;"></p>
+
+  <script src="https://js.stripe.com/v3/"></script>
+  <script>
+    var stripe = Stripe('{{ stripe_public_key }}');
+    var btn = document.getElementById('buy-button');
+    var errMsg = document.getElementById('error-msg');
+
+    btn.addEventListener('click', function () {
+      btn.disabled = true;
+      btn.textContent = 'Processing…';
+      errMsg.style.display = 'none';
+
+      fetch('/buy/{{ item.pk }}/', { method: 'GET' })
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          return stripe.redirectToCheckout({ sessionId: data.id });
+        })
+        .then(function (result) {
+          if (result.error) {
+            errMsg.textContent = result.error.message;
+            errMsg.style.display = 'block';
+            btn.disabled = false;
+            btn.textContent = 'Buy';
+          }
+        })
+        .catch(function (err) {
+          errMsg.textContent = 'Something went wrong. Please try again.';
+          errMsg.style.display = 'block';
+          btn.disabled = false;
+          btn.textContent = 'Buy';
+        });
+    });
+  </script>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends "shop/base.html" %}
+
+{% block title %}Order #{{ order.pk }}{% endblock %}
+
+{% block content %}
+  <h1>Order #{{ order.pk }}</h1>
+
+  <ul class="items-list">
+    {% for item in order.items.all %}
+      <li>
+        {{ item.name }}
+        <span class="badge">{{ item.currency|upper }}</span>
+        — {{ item.price }} {{ item.currency|upper }}
+      </li>
+    {% endfor %}
+  </ul>
+
+  {% if order.discount %}
+    <p>Discount: <strong>{{ order.discount.name }}</strong></p>
+  {% endif %}
+  {% if order.tax %}
+    <p>Tax: <strong>{{ order.tax.name }} ({{ order.tax.percentage }}%)</strong></p>
+  {% endif %}
+
+  <p class="total">Total: {{ order.total_price }} {{ order.currency|upper }}</p>
+
+  <button id="buy-button" class="btn">Pay Now</button>
+  <p id="error-msg" style="color:#e25950;margin-top:12px;display:none;"></p>
+
+  <script src="https://js.stripe.com/v3/"></script>
+  <script>
+    var stripe = Stripe('{{ stripe_public_key }}');
+    var btn = document.getElementById('buy-button');
+    var errMsg = document.getElementById('error-msg');
+
+    btn.addEventListener('click', function () {
+      btn.disabled = true;
+      btn.textContent = 'Processing…';
+      errMsg.style.display = 'none';
+
+      fetch('/buy/order/{{ order.pk }}/', { method: 'GET' })
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          return stripe.redirectToCheckout({ sessionId: data.id });
+        })
+        .then(function (result) {
+          if (result.error) {
+            errMsg.textContent = result.error.message;
+            errMsg.style.display = 'block';
+            btn.disabled = false;
+            btn.textContent = 'Pay Now';
+          }
+        })
+        .catch(function () {
+          errMsg.textContent = 'Something went wrong. Please try again.';
+          errMsg.style.display = 'block';
+          btn.disabled = false;
+          btn.textContent = 'Pay Now';
+        });
+    });
+  </script>
+{% endblock %}
