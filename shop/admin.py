@@ -22,4 +22,3 @@ class TaxAdmin(admin.ModelAdmin):
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = ('id', 'total_price', 'discount', 'tax', 'created_at')
-    filter_horizontal = ('items',)
