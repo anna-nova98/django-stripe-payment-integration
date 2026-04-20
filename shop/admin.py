@@ -21,4 +21,8 @@ class TaxAdmin(admin.ModelAdmin):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('id', 'total_price', 'discount', 'tax', 'created_at')
+    list_display = ('id', 'get_total_price', 'discount', 'tax', 'created_at')
+
+    def get_total_price(self, obj):
+        return obj.total_price()
+    get_total_price.short_description = 'Total Price'
