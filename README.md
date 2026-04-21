@@ -4,11 +4,11 @@ A Django application that integrates with the Stripe API to create checkout sess
 
 ## 🚀 Live Demo
 
-**Deployed Application:** https://django-stripe-payment-integration-1.onrender.com
+**Deployed Application:** https://django-stripe-payment-integration.onrender.com
 
-**Admin Panel:** https://django-stripe-payment-integration-1.onrender.com/admin/
+**Admin Panel:** https://django-stripe-payment-integration.onrender.com/admin/
 - Username: `admin`
-- Password: (provided separately)
+- Password: `Admin2026`
 
 **Test the Payment Flow:**
 1. Login to admin panel and create test items
